@@ -1,0 +1,57 @@
+name: Build and deploy to ghcr for dev
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker-build-push:
+    # https://docs.github.com/en/actions/reference/environments#about-environments
+    environment: dev
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0' # Recommended to use by https://github.com/anothrNick/github-tag-action/blame/master/README.md#L35
+
+      #####
+      # Will generate a tag in the following format: `2021-11-22Z.01e3dd9.10327`
+      - name: Generate image tag
+        id: tag
+        env:
+          HASH: ${{ github.sha }}
+        run: |
+          stamp=$(date -u +%FZ)
+          short_sha=$(git rev-parse --short $HASH)
+          tag="$stamp.$short_sha.$RANDOM"
+          echo "::set-output name=IMAGE_TAG::$tag"
+        working-directory: .
+
+      # Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/oslokommune/golden-path-reference-app-${{ env.environment }}:latest
+            ghcr.io/oslokommune/golden-path-reference-app-${{ env.environment }}:${{ steps.tag.outputs.IMAGE_TAG }}
