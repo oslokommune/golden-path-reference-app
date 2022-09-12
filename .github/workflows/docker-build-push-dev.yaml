@@ -53,5 +53,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/oslokommune/golden-path-reference-app-${{ env.environment }}:latest
-            ghcr.io/oslokommune/golden-path-reference-app-${{ env.environment }}:${{ steps.tag.outputs.IMAGE_TAG }}
+            ghcr.io/oslokommune/golden-path-reference-app-dev:latest
+            ghcr.io/oslokommune/golden-path-reference-app-dev:${{ steps.tag.outputs.IMAGE_TAG }}
