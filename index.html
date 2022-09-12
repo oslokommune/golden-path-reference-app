@@ -1,0 +1,220 @@
+<html lang="EN">
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        @font-face {
+            font-family: 'oslosans';
+            src: url("/OsloSans-Regular.woff") format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        h1 {
+            font-size: 25px;
+
+            position: relative;
+        }
+
+        #ingress {
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            font-family: oslosans;
+        }
+
+        .actions {
+            text-align: left;
+            position: relative;
+            margin-top: 25px;
+        }
+
+        .actions p {
+            height: 25px;
+            margin-bottom: 20px;
+        }
+
+
+        button.fullwidth {
+            width: 40%;
+            float: none;
+            margin-left: 30%;
+            border-radius: 0;
+        }
+
+        button {
+            width: 40%;
+            background-color: #f9c66b;
+            float: right;
+            border-radius: 0 !important;
+
+        }
+
+        button.disabled {
+            pointer-events: none;
+            background-color: rgb(223, 223, 223);
+        }
+
+
+        button:focus {
+            color: #fff !important;
+        }
+
+        button:hover {
+            background-color: #D0BFAE;
+            color: black !important;
+        }
+
+        input {
+            line-height: 27px;
+            margin-top: 1px;
+            width: 59%;
+            border-radius: 0;
+
+        }
+
+        iframe {
+            display: none;
+        }
+
+        iframe.active {
+            animation: fadein 1s;
+            display: inline-block;
+            border-style: none;
+            width: 100%;
+            margin-bottom: 25px;
+            background-color: #333333;
+            padding: 10px;
+            height: 200px;
+        }
+
+        .gopher {
+            width: 15%;
+            margin-top: 20px;
+        }
+
+        .no_input_actions {
+            margin: 35px 0;
+        }
+
+        .content {
+            margin: 0 auto;
+            float: none
+        }
+
+        ul {
+            width: 70%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            margin-left: 21%
+        }
+
+    </style>
+    <title>Golden Path reference app</title>
+</head>
+<body>
+<div id="app">
+    <div class="container">
+        <div class="content col-xl-6 col-lg-8 col-md-10 col-sm-12">
+            <img class="gopher" src="gopher.png">
+            <h1>Super simple reference application</h1>
+            <p id="ingress">
+                This app offers some simple functionality to test your app:
+                <ul>
+                    <li>Write to your error log, using the crash button</li>
+                    <li>List all entries in the database</li>
+                    <li>Write custom input to your info log</li>
+                    <li>Write an entry to the database connected to the app</li>
+                </ul>
+            </p>
+
+            <div class="actions">
+                <div class="no_input_actions">
+                    <p>
+                        <button class="btn fullwidth" onclick="crashMeMaybe()">Crash?</button>
+                    </p>
+                    <p>
+                        <button class="btn fullwidth" onclick="listusers()">List entries in database</button>
+                    </p>
+                </div>
+                <div class="input_actions">
+                    <p>
+                        <input id="logcontent" oninput="toggleButton(this)" />
+                        <button class="btn disabled" disabled="true"
+                                onclick="logthis()">Write to info log
+                        </button>
+
+                    </p>
+
+                    <p><strong></strong>
+                        <input id="newuser" oninput="toggleButton(this)" />
+                        <button class="btn disabled" disabled="true"
+                                onclick="addUser()">Write entry to database
+                        </button>
+                    </p>
+
+                </div>
+
+            </div>
+            <br/>
+            <iframe id="result" scrolling="no" onload="setFrameTextColor()"></iframe>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    function toggleButton(input) {
+        var button = input.nextElementSibling
+        if(input.value) {
+            button.disabled = false
+            button.classList = "btn"
+        } else {
+            button.classList = "btn disabled"
+            button.disabled = true
+        }
+    }
+
+    function setFrameTextColor() {
+        // Has to be set in JS, since regular CSS won't 'reach' into the iframe
+        var frame = document.getElementById("result")
+        frame.contentWindow.document.body.style.color='white';
+    }
+    function activeFrame() {
+        var frame = document.getElementById("result")
+        frame.classList = "active"
+    }
+
+    function logthis() {
+        activeFrame()
+        var logline = document.getElementById("logcontent").value
+        var frame = document.getElementById("result")
+        frame.src = "/logthis?logline=" + logline
+    }
+
+    function addUser() {
+        activeFrame()
+        var username = document.getElementById("newuser").value
+        var frame = document.getElementById("result")
+        frame.src = "/adduser?username=" + username
+    }
+
+    function listusers() {
+        activeFrame()
+        var frame = document.getElementById("result")
+        frame.src = "/users"
+    }
+
+    function crashMeMaybe() {
+        activeFrame()
+        var frame = document.getElementById("result")
+        frame.src = "/risky"
+    }
+</script>
+</html>
