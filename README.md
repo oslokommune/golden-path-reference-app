@@ -1,3 +1,5 @@
+Deprecated. See https://github.com/oslokommune/pirates-apps instead.
+
 # Running locally
 
 Run:
